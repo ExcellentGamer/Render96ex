@@ -47,21 +47,8 @@ enum SaveFileIndex {
 
 struct MainMenuSaveData
 {
-    // Each save file has a 2 bit "age" for each course. The higher this value,
-    // the older the high score is. This is used for tie-breaking when displaying
-    // on the high score screen.
     u32 coinScoreAges[NUM_SAVE_FILES];
     u16 soundMode;
-
-#ifdef VERSION_EU
-    u16 language;
-#define SUBTRAHEND 8
-#else
-#define SUBTRAHEND 6
-#endif
-
-    // Pad to match the EEPROM size of 0x200 (10 bytes on JP/US, 8 bytes on EU)
-    u8 filler[EEPROM_SIZE / 2 - SUBTRAHEND - NUM_SAVE_FILES * (4 + sizeof(struct SaveFile))];
 
     struct SaveBlockSignature signature;
 };

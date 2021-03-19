@@ -16,8 +16,6 @@
 #define MENU_DATA_MAGIC 0x4849
 #define SAVE_FILE_MAGIC 0x4441
 
-STATIC_ASSERT(sizeof(struct SaveBuffer) == EEPROM_SIZE, "eeprom buffer size must match");
-
 extern struct SaveBuffer gSaveBuffer;
 
 struct WarpCheckpoint gWarpCheckpoint;
@@ -39,17 +37,14 @@ u8 gSpecialTripleJump = 0;
 s8 gLevelToCourseNumTable[] = {
     #include "levels/level_defines.h"
 };
+
 #undef STUB_LEVEL
 #undef DEFINE_LEVEL
 
 STATIC_ASSERT(ARRAY_COUNT(gLevelToCourseNumTable) == LEVEL_COUNT - 1,
               "change this array if you are adding levels");
 
-#ifdef TEXTSAVES
-
 #include "text_save.inc.h"
-
-#endif
 
 // This was probably used to set progress to 100% for debugging, but
 // it was removed from the release ROM.
@@ -758,4 +753,10 @@ s32 check_warp_checkpoint(struct WarpNode *warpNode) {
     }
 
     return isWarpCheckpointActive;
+}
+u32 save_file_get_cannon_flags(s32 fileIndex, s32 courseIndex) {
+
+    if (gSaveBuffer.files[fileIndex][0].courseStars[courseIndex+1] & 0x80){return 1;}
+
+    return 0;
 }

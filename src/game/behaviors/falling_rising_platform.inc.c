@@ -18,11 +18,32 @@ void bhv_ddd_moving_pole_loop(void) {
 }
 
 void bhv_bitfs_sinking_cage_platform_loop(void) {
-    if (o->oBehParams2ndByte != 0) {
-        if (o->oTimer == 0)
-            o->oPosY -= 300.0f;
-        o->oPosY += sins(o->oPlatformTimer) * 7.0f;
-    } else
-        o->oPosY -= sins(o->oPlatformTimer) * 3.0f;
+    switch (o->oBehParams2ndByte) {
+        case 0:
+            o->oPosY -= sins(o->oPlatformTimer) * 3.0f;
+            break;
+        case 1:
+            if (o->oTimer == 0) {
+                o->oPosY -= 300.0f;
+                break;
+            }
+            o->oPosY += sins(o->oPlatformTimer) * 7.0f;
+            break;
+        case 2:
+            o->oPosY -= sins(o->oPlatformTimer) * 4.0f;
+            break;
+        case 3:
+            o->oPosY -= sins(o->oPlatformTimer) * 4.0f;
+            o->oPlatformTimer += 0x20;
+            break;
+        case 4:
+            o->oPosY -= sins(o->oPlatformTimer) * 4.0f;
+            o->oPlatformTimer += 0x40;
+            break;
+        case 5:
+            o->oPosY -= sins(o->oPlatformTimer) * 4.0f;
+            o->oPlatformTimer += 0x60;
+            break;
+    }
     o->oPlatformTimer += 0x100;
 }
