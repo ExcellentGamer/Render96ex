@@ -359,8 +359,13 @@ u32 common_air_action_step(struct MarioState *m, u32 landAction, s32 animation, 
     switch (stepResult) {
         case AIR_STEP_NONE:
             cheats_blj_anywhere(m);
-            if ((animation == MARIO_ANIM_SINGLE_JUMP && isLuigi()) && (animID == MARIO_ANIM_FORWARD_FLIP || is_anim_at_end(m))) {
-                set_mario_animation(m, MARIO_ANIM_FORWARD_FLIP);
+            if (((animation == MARIO_ANIM_SINGLE_JUMP || animation == MARIO_ANIM_DOUBLE_JUMP_FALL) && (m->vel[1] < 0) && (m->input & INPUT_A_DOWN) && isLuigi() && !(m->flags & MARIO_WING_CAP)) && (m->marioObj->header.gfx.curAnim.animID == MARIO_ANIM_RUNNING|| is_anim_at_end(m))) {
+                set_mario_anim_with_accel(m, MARIO_ANIM_RUNNING, 0x00095000);
+                if (is_anim_at_end(m)) {
+                    set_anim_to_frame(m, 0);
+                }
+            } else if (((animation == MARIO_ANIM_JUMP_WITH_LIGHT_OBJ) && (m->vel[1] < 0) && (m->input & INPUT_A_DOWN) && isLuigi() && !(m->flags & MARIO_WING_CAP)) && (m->marioObj->header.gfx.curAnim.animID == MARIO_ANIM_RUN_WITH_LIGHT_OBJ || is_anim_at_end(m))) {
+                set_mario_anim_with_accel(m, MARIO_ANIM_RUN_WITH_LIGHT_OBJ, 0x00095000);
                 if (is_anim_at_end(m)) {
                     set_anim_to_frame(m, 0);
                 }
@@ -436,7 +441,9 @@ s32 flutterTimer = 0;
 
 void flutterJump(struct MarioState *m){
     if (m->vel[1] < 0 && m->input & INPUT_A_DOWN && isLuigi() && !(m->flags & MARIO_WING_CAP)) {                
+    
         m->vel[1] += 2.3;
+
         if(m->forwardVel > 0){
             m->forwardVel -= 1.2;
         }
@@ -487,6 +494,9 @@ s32 act_double_jump(struct MarioState *m) {
     if (m->input & INPUT_Z_PRESSED) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
     }
+
+    flutterJump(m);
+
     r96_play_character_sound_if_no_flag(m, R96_MARIO_HOOHOO, R96_LUIGI_HOOHOO, R96_WARIO_HOOHOO, MARIO_MARIO_SOUND_PLAYED);
     r96_play_action_sound(m, SOUND_ACTION_TERRAIN_JUMP);
     common_air_action_step(m, ACT_DOUBLE_JUMP_LAND, animation, AIR_STEP_CHECK_LEDGE_GRAB | AIR_STEP_CHECK_HANG);
@@ -593,6 +603,8 @@ s32 act_hold_jump(struct MarioState *m) {
     if (m->input & INPUT_Z_PRESSED) {
         return drop_and_set_mario_action(m, ACT_GROUND_POUND, 0);
     }
+
+    flutterJump(m);
 
     r96_play_action_sound(m, SOUND_ACTION_TERRAIN_JUMP);
     r96_play_character_jump_sound(m);
